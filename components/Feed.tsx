@@ -1,11 +1,17 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, FlatList, SafeAreaView} from 'react-native';
+import {View, Text, StyleSheet, Button, ActivityIndicator, FlatList, SafeAreaView, RefreshControl} from 'react-native';
 import { IFeedPost } from '@/interfaces/feedPost';
 import api from '../services/api';
-import { ScrollView } from 'react-native-gesture-handler';
+import FeedItem from './FeedItem';
+import {useRouter} from 'expo-router';
 
-export default function Feed(){
-    const [feedOption, setFeedOption] = useState<string>('ALL');
+interface FeedProps {
+    userId?: number | null
+}
+
+export default function Feed({userId}:FeedProps){
+    const router = useRouter();
+
     const [feedPage, setFeedPage] = useState<number>(1)
     const [loadingFeed, setLoadingFeed] = useState<boolean>(true);
     const [feedItems, setFeedItems] = useState<IFeedPost[]>([]);
@@ -15,20 +21,16 @@ export default function Feed(){
         loadFeed(1);
     }, []);
 
-    const chooseFeedOption = (option:string):void => {
-        if(feedOption === option) return;
-        
-        setFeedEnd(false);
-        setFeedOption(option);
-        loadFeed(1);
+    const handleNewPost = () => {
+        router.push('/new-post');
     }
 
     const loadFeed = (pageLoad:number):void => {
         setLoadingFeed(true);
-        
+
         const itens = pageLoad > 1 ? [...feedItems] : [];
-        console.log('page', pageLoad)
-        api.get('feed', {page: pageLoad})
+
+        api.get('feed', {page: pageLoad, userId})
         .then(posts => {
             if(!posts.length){
                 setFeedEnd(true);
@@ -40,7 +42,7 @@ export default function Feed(){
                     id: p.id, 
                     userId: p.userId,
                     userName: p.userName,
-                    userAvatarURI: p.userName,
+                    userAvatarURI: p.userAvatarURI,
                     mediaType: p.mediaType,
                     mediaURI: p.mediaURI,
                     title: p.title,
@@ -63,14 +65,7 @@ export default function Feed(){
 
     return(
         <View>
-            <View style={styles.menuTop}>
-                <TouchableOpacity onPress={() => chooseFeedOption('ALL')}>
-                    <Text style={feedOption === 'ALL' ? styles.menuItemSelected : styles.menuItem}>Geral</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => chooseFeedOption('FOLLOWING')}>
-                    <Text style={feedOption === 'FOLLOWING' ? styles.menuItemSelected : styles.menuItem}>Seguindo</Text>
-                </TouchableOpacity>
-            </View>
+            
             <View style={styles.feedContainer}>
                 {loadingFeed ?
                     <ActivityIndicator size="large" color="#0000ff" />
@@ -84,25 +79,22 @@ export default function Feed(){
                             onEndReached={() => loadFeed(feedPage + 1)}
                             onEndReachedThreshold={0.3}
                             initialScrollIndex={0}
+                            ListHeaderComponent={<Button
+                                title="+ Novo post"
+                                onPress={handleNewPost}
+                            />}
+                            refreshControl={
+                                <RefreshControl
+                                    refreshing={loadingFeed}
+                                    onRefresh={() => loadFeed(1)}
+                                />
+                            }
                         />                        
                     </SafeAreaView>                    
                 }
             </View>            
         </View>
         
-    )
-}
-
-interface FeedItemProps {
-    item: IFeedPost;
-}
-
-const FeedItem = ({item}:FeedItemProps) => {
-    return(
-        <View>
-            <Text>{item.userName}</Text>
-            <View style={styles.mediaContainer}></View>
-        </View>
     )
 }
 
@@ -126,8 +118,13 @@ const styles = StyleSheet.create({
         padding: 5
     },
     mediaContainer: {
+        marginTop: 5,
         width: '100%',
-        height: 500,
+        height: 300,
         backgroundColor: 'gray'
-    }
+    },
+    video: {
+        width: 350,
+        height: 275,
+    },
 });
