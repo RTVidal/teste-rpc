@@ -1,50 +1,56 @@
-# Seja bem-vindo ao aplicativo "Video&Video", desenvolvido como projeto do teste técnico para o cargo de Analista Mobile Pleno na RPC 👋
+# Seja bem-vindo ao aplicativo "Video&Video", desenvolvido como projeto para o teste técnico para o cargo de Analista de Sistemas Mobile Pleno na RPC 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Projeto [Expo](https://expo.dev) criado com [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Get started
 
-1. Install dependencies
+## Instalar e executar o aplicativo
+
+Após o downlod do repositório, executar os seguintes comandos para rodar o projeto localmente em um emulador ou dispositivo android conectado
+
+1. Instalar dependências
 
    ```bash
    npm install
    ```
 
-2. Start the app
+Opção 1: Gerar build localmente
+
+2. Gerar um build local
+
+   ```bash
+   npx expo run:android
+   ```
+
+3. Iniciar o aplicativo e o servidor de desenvolvimento
 
    ```bash
     npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+4. Seguir as instruções do prompt para atualizar o aplicativo no dispositivo
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Opção 2: Gerar build via **eas**
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+2. Gerar um build
 
-## Get a fresh project
+   ```bash
+   eas build --platform android --profile development
+   ```
 
-When you're ready, run:
+3. Iniciar o aplicativo e o servidor de desenvolvimento
 
-```bash
-npm run reset-project
-```
+   ```bash
+    npx expo start
+   ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+4. Seguir as instruções do prompt para atualizar o aplicativo no dispositivo
 
-## Learn more
+## Observações gerais
 
-To learn more about developing your project with Expo, look at the following resources:
+Devido à limitações de dispositivos paradesenvolvimento e testes, o projeto foi desenvolvido com foco em ambiente Android
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+O aplicativo possui um módulo interno simulando uma api, dispensando conexão com a internet.
 
-## Join the community
+Para fins de otimização, os posts de usuários fictícios exibem o mesmo asset de vídeo. Entretando, cada post é único dentro do cenário do aplicativo.
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Em caso de dúvidas, é possível entrar em contato através do email **rafaelvidal4@gmail.com**.
