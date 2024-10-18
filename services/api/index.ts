@@ -6,11 +6,13 @@ const api = {
         return new Promise((resolve, reject) => {
             switch(service){
                 case 'feed':
-                    return resolve(feed(body));
+                    return resolve(getFeed(body));
                 case 'user':
-                    return resolve(user(body));
-                case 'feed/post':
-                    return resolve(getFeedPost(body));
+                    return resolve(getUser(body));
+                case 'post':
+                    return resolve(getPost(body));
+                case 'comments':
+                    return resolve(getComments(body));
                 
                 default: reject(404);
             }
@@ -21,7 +23,7 @@ const api = {
         return new Promise((resolve, reject) => {
             switch(service){
                 case 'login':
-                    return resolve(login(body));
+                    return resolve(postLogin(body));
                 
                 case 'like':
                     return resolve(postLike(body));
@@ -38,11 +40,13 @@ const api = {
         return new Promise((resolve, reject) => {
             switch(service){
                 case 'register':
-                    return resolve(register(body));
+                    return resolve(putRegister(body));
                 
-                case 'feed/post':
-                        return resolve(putFeedPost(body));
-    
+                case 'post':
+                    return resolve(putPost(body));
+
+                case 'comment':
+                    return resolve(putComment(body));
                 
 
                 default: reject(404);
@@ -53,7 +57,7 @@ const api = {
 
 export default api;
 
-const login = (credentials:{email: string, password: string}): Promise<any> => {
+const postLogin = (credentials:{email: string, password: string}): Promise<any> => {
     return new Promise((resolve, reject) => {
         AsyncStorage.getItem('users')
         .then((users:any) => {
@@ -74,7 +78,7 @@ const login = (credentials:{email: string, password: string}): Promise<any> => {
     });
 }
 
-const register = (user:{name: string, email: string, password: string}): Promise<any> => {
+const putRegister = (user:{name: string, email: string, password: string}): Promise<any> => {
     return new Promise((resolve, reject) => {
         AsyncStorage.getItem('users')
         .then((users:any) => {
@@ -107,7 +111,7 @@ const register = (user:{name: string, email: string, password: string}): Promise
     });
 }
 
-const putFeedPost = (post:{userId: number, userName: string, title: string, videoURI: string}): Promise<any> => {
+const putPost = (post:{userId: number, userName: string, title: string, videoURI: string}): Promise<any> => {
     return new Promise((resolve, reject) => {
         const postId = Date.now();
         const fileName = `${postId.toString()}.mp4`;
@@ -192,12 +196,14 @@ const postShare = (postShare:{userId: number, postId: Number}): Promise<any> => 
                     storedShares = storedShares.filter((l:any) => l.userId !== postShare.userId && l.postId !== postShare.postId);
                     shared = false;
                 } else {                    
-                    storedShares.push(postShare);
+                    storedShares.push({
+                        ...postShare,
+                        moment: Date.now()
+                    });
                 }                
 
                 AsyncStorage.setItem('shares', JSON.stringify(storedShares));
 
-                console.log('shared', shared);
                 return resolve({shared});
             }
 
@@ -211,60 +217,81 @@ const postShare = (postShare:{userId: number, postId: Number}): Promise<any> => 
     });
 }
 
-const feed = (filters: {userId: number, page: number, feedOption: string}): Promise<any> => {
+const getFeed = (filters: {userId: number, page: number}): Promise<any> => {
     return new Promise((resolve, reject) => {
-        AsyncStorage.getItem('videos')
-        .then(videosData => {
-            let allPosts:any = [];
+        let itensPerPage:number = 3;
+        let itemStart:number = itensPerPage*filters.page - itensPerPage + 1;
+        let itemEnd:number = itemStart + itensPerPage;
+        let allPosts:any = [];
 
-            if(videosData){
-                const storedPosts = JSON.parse(videosData);
+        if(filters.userId){
+            AsyncStorage.getItem('videos')
+            .then(postsData => {
+                AsyncStorage.getItem('shares')
+                .then(sharesData => {
+                    let userShares = [];
+                    if(sharesData) {
+                        userShares = JSON.parse(sharesData);
+                        userShares = userShares.filter((s: any) => s.userId === filters.userId);
+                    }
+                    if(postsData) allPosts = JSON.parse(postsData);
 
-                storedPosts.forEach((sp:any) => {
-                    allPosts.push({
-                        id: sp.id,
-                        userId: sp.userId,
-                        userName: sp.userName,
-                        mediaType: 'IMAGE',
-                        mediaURI: sp.mediaURI,
-                        title: sp.title
+                    allPosts = allPosts.concat(defaultFeed);
+                    allPosts = allPosts.filter((p:any) => p.userId === filters.userId || 
+                        userShares.filter((s:any) => s.postId.toString() === p.id.toString()).length);
+                    
+                    let pagePosts = filters.page ? allPosts.slice(itemStart - 1, itemEnd - 1) : allPosts;
+                    let returnPosts:any = [];
+
+                    pagePosts.forEach((p: any) => {
+                        const postUser = defaultUsers.filter(u => u.id === p.userId)[0];
+            
+                        returnPosts.push({
+                            id: p.id,
+                            userId: p.userId,
+                            userName: postUser ? postUser.name : p.userName,
+                            userAvatarURI: postUser ? postUser.avatarURI : '',
+                            mediaType: p.mediaType,
+                            mediaURI: p.mediaURI,
+                            title: p.title
+                        });
                     });
-                })
-            }
 
-            let defaultPosts = (filters.userId) ? defaultFeed.filter(p => p.userId.toString() === filters.userId.toString()) : defaultFeed;
-            allPosts = allPosts.concat(defaultPosts);
-
-            let itensPerPage = 2;
-            let itemStart = itensPerPage*filters.page - itensPerPage + 1;
-            let itemEnd = itemStart + itensPerPage;
-            
-            let pagePosts = filters.page ? allPosts.slice(itemStart - 1, itemEnd - 1) : allPosts;
-            
-            const posts:any = [];
-    
-            pagePosts.forEach((p: any) => {
-                const postUser = defaultUsers.filter(u => u.id === p.userId)[0];
-    
-                posts.push({
-                    id: p.id,
-                    userId: p.userId,
-                    userName: postUser ? postUser.name : p.userName,
-                    userAvatarURI: postUser ? postUser.avatarURI : '',
-                    mediaType: p.mediaType,
-                    mediaURI: p.mediaURI,
-                    title: p.title,
-                    qtComments: 0,
-                    qtLikes: 0
+                    return resolve(returnPosts);
                 });
+            })
+        } else {
+            AsyncStorage.getItem('videos')
+            .then(postsData => {
+                if(postsData) allPosts = JSON.parse(postsData);
+                
+                allPosts = allPosts.concat(defaultFeed);
+
+                let pagePosts = filters.page ? allPosts.slice(itemStart - 1, itemEnd - 1) : allPosts;
+                let returnPosts:any = [];
+
+                pagePosts.forEach((p: any) => {
+                    const postUser = defaultUsers.filter(u => u.id === p.userId)[0];
+
+                    returnPosts.push({
+                        id: p.id,
+                        userId: p.userId,
+                        userName: postUser ? postUser.name : p.userName,
+                        userAvatarURI: postUser ? postUser.avatarURI : '',
+                        mediaType: p.mediaType,
+                        mediaURI: p.mediaURI,
+                        title: p.title
+                    });
+                });
+
+                return resolve(returnPosts);
             });
-    
-            resolve(posts);
-        });
+        }
+        
     });
 }
 
-const getFeedPost = (id: string): Promise<any> => {
+const getPost = (id: string): Promise<any> => {
     return new Promise((resolve, reject) => {
         const post = defaultFeed.filter(p => p.id.toString() === id)[0];
 
@@ -305,7 +332,7 @@ const getFeedPost = (id: string): Promise<any> => {
     });
 }
 
-const user = (id: string): Promise<any> => {
+const getUser = (id: string): Promise<any> => {
     return new Promise((resolve, reject) => {
         let user = defaultUsers.filter(u => u.id.toString() === id)[0];
         if(user) return resolve(user);
@@ -321,6 +348,51 @@ const user = (id: string): Promise<any> => {
             }
 
             return reject();
+        })
+        .catch(err => {
+            console.log(err);
+            return reject();
+        });
+    });
+}
+
+const putComment = (comment:{userId: number, userName: string, postId: Number, comment:String}): Promise<any> => {
+    return new Promise((resolve, reject) => {
+        AsyncStorage.getItem('comments')
+        .then((commentsData:any) => {
+            if(commentsData){
+                let storedComments = JSON.parse(commentsData);
+                
+                storedComments.push(comment);               
+
+                AsyncStorage.setItem('comments', JSON.stringify(storedComments));
+
+                return resolve(comment);
+            }
+
+            AsyncStorage.setItem('comments', JSON.stringify([comment]));
+
+            return resolve(comment);
+        })
+        .catch(err => {
+            console.log(err);
+            return reject();
+        });
+    });
+}
+
+const getComments = (postId: number) => {
+    return new Promise((resolve, reject) => {
+        AsyncStorage.getItem('comments')
+        .then((commentsData:any) => {           
+            let postComments:any = [];
+
+            if(commentsData){                
+                postComments = JSON.parse(commentsData);
+                postComments = postComments.filter((c:any) => c.postId === postId);
+            }
+
+            return resolve(postComments);
         })
         .catch(err => {
             console.log(err);

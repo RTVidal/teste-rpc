@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {View, ScrollView, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, ScrollView, Text, TouchableOpacity, StyleSheet, TextInput, Button} from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import api from '../../../services/api';
 import { IFeedPost } from '@/interfaces/feedPost';
@@ -18,20 +18,33 @@ export default function UserProfile(){
     const [post, setPost] = useState<IFeedPost | any>({});
     const [liked, setLiked] = useState<boolean>(false);
     const [shared, setShared] = useState<boolean>(false);
+    const [newComment, setNewComment] = useState<string>('');
+    const [comments, setComments] = useState<any[]>([]);
 
     useEffect(() => {        
         loadPost(id);
     }, []);
 
     const loadPost = (id:string):void => {        
-        api.get('feed/post', id)
+        api.get('post', id)
         .then(post => {
             setPost(post);
             setLiked(post.likes.filter((p:any) => p.userId === sessionData?.userId).length);
+            getPostComments(id);
         })
         .catch(err => {
             console.log(err);
+        });
+    }
+
+    const getPostComments = (postId: string) => {
+        api.get('comments', postId)
+        .then(comments => {
+            setComments(comments);
         })
+        .catch(err => {
+            console.log(err);
+        });
     }
 
     const handleLike = ():void => {
@@ -44,14 +57,25 @@ export default function UserProfile(){
         })
     }
 
-    const handleShare= ():void => {
+    const handleShare = ():void => {
         api.post('share', {userId: sessionData?.userId, postId: id})
         .then(({shared}) => {
             setShared(shared);
         })
         .catch(err => {
             console.log(err);
+        });
+    }
+
+    const sendComment = ():void => {
+        api.put('comment', {userId: sessionData?.userId, userName: sessionData?.userName, postId: id, comment: newComment})
+        .then(() => {
+            setNewComment('');
+            getPostComments(id);
         })
+        .catch(err => {
+            console.log(err);
+        });
     }
     
     return(
@@ -66,6 +90,18 @@ export default function UserProfile(){
                 </TouchableOpacity>
             </View>
             <Text>Comentários</Text>
+            {comments.map((comment:any, key:number) => 
+                <View style={styles.commentBox} key={key}>
+                    <Text style={styles.commentUser}>{comment.userName}</Text>
+                    <Text style={styles.commentContent}>{comment.comment}</Text>
+                </View>
+            )}
+            <TextInput
+                placeholder='Novo comentário'
+                onChangeText={text => setNewComment(text)}
+                value={newComment}
+            />
+            <Button onPress={sendComment} title="Enviar comentário" />
         </ScrollView>
         
     )
@@ -86,5 +122,16 @@ const styles = StyleSheet.create({
     optionItemSelected: {
         fontSize: 16,
         fontWeight: 'bold'
+    },
+    commentBox: {
+        marginVertical: 5,
+        backgroundColor: '#eaeaea'
+    },
+    commentUser: {
+        fontSize: 18,
+        fontWeight: 'bold'
+    },
+    commentContent: {
+        fontSize: 16
     }
 });

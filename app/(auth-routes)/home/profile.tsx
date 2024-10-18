@@ -22,13 +22,13 @@ export default function Profile(){
 
     useEffect(() => {        
         loadUser(id);
-        loadUserFeed(id);
     }, []);
 
     const loadUser = (id:number):void => {
         api.get('user', sessionData?.userId)
         .then(user => {
             setUser(user);
+            loadUserFeed(id);
         })
         .catch(err => {
             console.log(err);
@@ -73,7 +73,7 @@ export default function Profile(){
     return(
         <View>
             <TouchableOpacity onPress={handleExit}>
-                <Text>Saaair (desfazer login)</Text>
+                <Text>Sair (desfazer login)</Text>
             </TouchableOpacity>
             <Image source={imageSource} style={{width: 60, height:60, margin: 5, resizeMode: 'stretch'}}></Image>           
             <Text>{user.name}</Text>

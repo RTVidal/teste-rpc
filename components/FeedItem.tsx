@@ -8,10 +8,11 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 interface FeedItemProps {
     item: IFeedPost
-    autoPlay?: boolean
+    autoPlay?: boolean,
+    userId?: number | null
 }
 
-export default function FeedItem({item, autoPlay}:FeedItemProps){
+export default function FeedItem({item, autoPlay, userId}:FeedItemProps){
     const [playing, setPlaying] = useState<boolean>(autoPlay ? true : false);
     const videoRef = useRef(null);
 
@@ -29,7 +30,6 @@ export default function FeedItem({item, autoPlay}:FeedItemProps){
         } else {
             player.play();
         }
-        console.log('playing', playing);
         setPlaying(!playing);
     }
 
@@ -52,34 +52,43 @@ export default function FeedItem({item, autoPlay}:FeedItemProps){
 
     return(
         <View style={{paddingVertical: 10}}>
-            <Link href={`/user-profile/${item.userId}` as Href}>
-                <View>
-                    <Image source={imageSource} style={{width: 45, height: 45, margin: 5, resizeMode: 'stretch'}}></Image>
-                </View>                
-                <Text>{item.userName}</Text>
-            </Link>                
-                <View style={styles.mediaContainer}>
-                    <VideoView
-                        ref={videoRef}
-                        style={styles.video}
-                        player={player}
-                        nativeControls={false}
-                    />
-                    <TouchableOpacity onPress={togglePlay}>
-                        <View style={styles.controlContainer}>
-                            <View style={styles.btnPlayPauseContainer}>
-                                <Ionicons name={playing ? 'pause' : 'play'} size={28} color="black" />
-                            </View>                            
-                        </View>                        
-                        {/* <Text style={{textAlign: 'center', fontWeight: 'bold'}}>{playing ? 'PAUSAR' : 'PLAY'}</Text> */}
-                    </TouchableOpacity>  
-                </View>
-                          
+            {userId ?
+                <View style={{display: 'flex', flexDirection: 'row'}}>
+                    {userId === item.userId ?
+                        <Text>Postado por {item.userName}</Text>
+                    :
+                        <Text>Compartilhado de {item.userName}</Text>
+                    }
+                    
+                </View>                      
+            :
+                <Link href={`/user-profile/${item.userId}` as Href}>
+                    <View>
+                        <Image source={imageSource} style={{width: 45, height: 45, margin: 5, resizeMode: 'stretch'}}></Image>
+                    </View>                
+                    <Text>{item.userName}</Text>
+                </Link> 
+            }                     
+            <View style={styles.mediaContainer}>
+                <VideoView
+                    ref={videoRef}
+                    style={styles.video}
+                    player={player}
+                    nativeControls={false}
+                />
+                <TouchableOpacity onPress={togglePlay}>
+                    <View style={styles.controlContainer}>
+                        <View style={styles.btnPlayPauseContainer}>
+                            <Ionicons name={playing ? 'pause' : 'play'} size={28} color="black" />
+                        </View>                            
+                    </View>
+                </TouchableOpacity>
+            </View>
+                        
             <Link href={`/post/${item.id}` as Href}>
                 <View style={{backgroundColor: ''}}>
                     <Text style={{textAlign: 'center'}}>{item.title}</Text>   
                 </View>
-                      
             </Link>
         </View>
     )
