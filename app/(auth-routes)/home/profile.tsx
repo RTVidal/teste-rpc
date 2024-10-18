@@ -17,7 +17,6 @@ export default function Profile(){
     const router = useRouter();
     const { signOut, sessionData } = useSession();
     const [user, setUser] = useState<IUserProfile>({});
-    const [userFeed, setUserFeed] = useState<any[]>([]);
 
     useEffect(() => {
         loadUser();
@@ -27,39 +26,11 @@ export default function Profile(){
         api.get('user', sessionData?.userId)
         .then(user => {
             setUser(user);
-            loadUserFeed(sessionData?.userId);
         })
         .catch(err => {
             console.log(err);
             alert('Não foi possível carregar os dados do usuário');
         })
-    }
-
-    const loadUserFeed = (userId?:number):void => {
-        api.get('feed', {userId})
-        .then(posts => {
-            const feedItems:any = [];
-
-            posts.forEach((p:IFeedPost) => {
-                feedItems.push({
-                    id: p.id, 
-                    userId: p.userId,
-                    userName: p.userName,
-                    userAvatarURI: p.userAvatarURI,
-                    mediaType: p.mediaType,
-                    mediaURI: p.mediaURI,
-                    title: p.title,
-                    qtComments: p.qtComments,
-                    qtLikes: p.qtLikes
-                });
-            });
-
-            setUserFeed(feedItems);
-        })
-        .catch(err => {
-            console.log(err);
-            alert('Não foi possível obter os posts');
-        });
     }
 
     const handleExit = ():void => {

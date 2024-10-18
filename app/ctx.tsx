@@ -35,10 +35,6 @@ export function SessionProvider(props: React.PropsWithChildren) {
     <AuthContext.Provider
       value={{
         signIn: userData => {
-          // Add your login logic here
-          // For example purposes, we'll just set a fake session in storage
-          //This likely would be a JWT token or other session data
-          console.log('iniciando sessão');
           setSession(JSON.stringify(userData));
         },
         signOut: () => {
@@ -46,11 +42,6 @@ export function SessionProvider(props: React.PropsWithChildren) {
         },
         session,
         sessionData: session ? returnUserData(session) : null,
-        // sessionData: () => {
-        //     if(!session) return null;
-        
-            
-        // },
         isLoading,
       }}
     >

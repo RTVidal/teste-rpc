@@ -4,14 +4,14 @@ import { IFeedPost } from '@/interfaces/feedPost';
 import api from '../services/api';
 import FeedItem from './FeedItem';
 import {useRouter} from 'expo-router';
-import { usePathname } from "expo-router";
+//import { usePathname } from "expo-router";
 
 interface FeedProps {
     userId?: number | null
 }
 
 export default function Feed({userId}:FeedProps){
-    const path = usePathname();
+    // const path = usePathname();
     const router = useRouter();
 
     const [feedPage, setFeedPage] = useState<number>(1)
@@ -21,7 +21,7 @@ export default function Feed({userId}:FeedProps){
 
     useEffect(() => {
         loadFeed(1);
-    }, [path]);
+    }, []);
 
     const handleNewPost = () => {
         router.push('/new-post');
@@ -33,7 +33,7 @@ export default function Feed({userId}:FeedProps){
     }
 
     const loadFeed = (pageLoad:number):void => {
-        if(feedEnd) return;
+        //if(feedEnd) return;
 
         setLoadingFeed(true);
 
@@ -41,6 +41,8 @@ export default function Feed({userId}:FeedProps){
 
         api.get('feed', {page: pageLoad, userId})
         .then(posts => {
+            setLoadingFeed(false);
+
             if(posts.length < 3){
                 setFeedEnd(true);
                 if(!posts.length) return;
@@ -61,16 +63,13 @@ export default function Feed({userId}:FeedProps){
             });
 
             setFeedItems(itens);
-            setFeedPage(pageLoad);
-            setLoadingFeed(false);
+            setFeedPage(pageLoad);            
         })
         .catch(err => {
             console.log(err);
             alert('Não foi possível obter os posts');
             setLoadingFeed(false);
         });
-
-        
     }
 
     return(
@@ -81,8 +80,10 @@ export default function Feed({userId}:FeedProps){
                         data={feedItems}
                         renderItem={({item}) => <FeedItem item={item} userId={userId} />}
                         keyExtractor={item => item.id ? item.id.toString() : ''}
-                        onEndReached={() => loadFeed(feedPage + 1)}
-                        onEndReachedThreshold={1}
+                        onEndReached={() => {
+                            if(feedItems.length) loadFeed(feedPage + 1);                            
+                        }}
+                        onEndReachedThreshold={0.3}
                         initialScrollIndex={0}
                         ListHeaderComponent={userId ? null : 
                             <TouchableOpacity onPress={handleNewPost}>

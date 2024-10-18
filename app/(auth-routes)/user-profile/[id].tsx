@@ -14,50 +14,20 @@ export interface IUserProfile {
 export default function UserProfile(){
     const {id}:string | any = useLocalSearchParams();
     const [user, setUser] = useState<IUserProfile>({});
-    const [userFeed, setUserFeed] = useState<[]>([]);
 
     useEffect(() => {
         loadUser(id);
-        loadUserFeed(id);
     }, []);
 
     const loadUser = (id:number):void => {
         api.get('user', id)
         .then(user => {
             setUser(user);
-            loadUserFeed(id);
         })
         .catch(err => {
             console.log(err);
             alert('Não foi possível carregar os dados do usuário');
         })
-    }
-
-    const loadUserFeed = (userId:number):void => {
-        api.get('feed', {userId})
-        .then(posts => {
-            const feedItems:any = [];
-
-            posts.forEach((p:IFeedPost) => {
-                feedItems.push({
-                    id: p.id, 
-                    userId: p.userId,
-                    userName: p.userName,
-                    userAvatarURI: p.userAvatarURI,
-                    mediaType: p.mediaType,
-                    mediaURI: p.mediaURI,
-                    title: p.title,
-                    qtComments: p.qtComments,
-                    qtLikes: p.qtLikes
-                });
-            });
-
-            setUserFeed(feedItems);
-        })
-        .catch(err => {
-            console.log(err);
-            alert('Não foi possível obter os posts');
-        });
     }
 
     let imageSource = null;

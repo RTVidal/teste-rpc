@@ -1,4 +1,4 @@
-# Welcome to your Expo app 👋
+# Seja bem-vindo ao aplicativo "Video&Video", desenvolvido como projeto do teste técnico para o cargo de Analista Mobile Pleno na RPC 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 

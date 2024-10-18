@@ -1,5 +1,4 @@
-import React, {useEffect, useState, useContext} from 'react';
-import { Stack, useRouter, Slot } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-reanimated';
 import { SessionProvider } from "./ctx";
@@ -9,10 +8,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-    useEffect(() => {
-        console.log('use effect top');
-    }, []);
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <SessionProvider>

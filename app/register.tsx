@@ -53,14 +53,14 @@ export default function Register(){
         
         if(!isOk) return;
 
-        api.post('register', {name, email, password})
+        api.put('register', {name, email, password})
         .then(() => {
             alert('Cadastro efetuado com sucesso!');
             router.replace('/login');
         })
         .catch((err:string) => {
             if(err === 'already_exists') return alert('Usuário já cadastrado.');
-
+            console.log(err);
             alert('Não foi possível finalizar o cadastro. Verifique os dados informados.');
         })
     }

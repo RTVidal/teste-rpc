@@ -23,8 +23,6 @@ export default function Login(){
     }
 
     const handleLogin = ():void => {
-        console.log('session data', sessionData);
-
         if(!email || !password) return alert('Credenciais inválidas');
 
         
