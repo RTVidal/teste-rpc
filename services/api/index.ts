@@ -225,7 +225,6 @@ const getFeed = (filters: {userId: number, page: number}): Promise<any> => {
         let allPosts:any = [];
 
         if(filters.userId){
-            console.log('feed', filters.userId)
             AsyncStorage.getItem('videos')
             .then(postsData => {
                 AsyncStorage.getItem('shares')
@@ -244,9 +243,7 @@ const getFeed = (filters: {userId: number, page: number}): Promise<any> => {
                     console.log('allPosts', allPosts)
                     let pagePosts = filters.page ? allPosts.slice(itemStart - 1, itemEnd - 1) : allPosts;
                     let returnPosts:any = [];
-                    console.log('pagePosts aa', filters.page, pagePosts)
                     pagePosts.forEach((p: any) => {
-                        console.log('page', p);
                         const postUser = defaultUsers.filter(u => u.id === p.userId)[0];
             
                         returnPosts.push({
@@ -258,9 +255,8 @@ const getFeed = (filters: {userId: number, page: number}): Promise<any> => {
                             mediaURI: p.mediaURI,
                             title: p.title
                         });
-                        console.log('adicionou return');
                     });
-                    console.log('returnPosts', returnPosts);
+                    
                     return resolve(returnPosts);
                 });
             })
