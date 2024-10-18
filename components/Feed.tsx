@@ -81,7 +81,7 @@ export default function Feed({userId}:FeedProps){
                         renderItem={({item}) => <FeedItem item={item} userId={userId} />}
                         keyExtractor={item => item.id ? item.id.toString() : ''}
                         onEndReached={() => {
-                            if(feedItems.length) loadFeed(feedPage + 1);                            
+                            if(feedItems.length >= 3) loadFeed(feedPage + 1);                            
                         }}
                         onEndReachedThreshold={0.3}
                         initialScrollIndex={0}
