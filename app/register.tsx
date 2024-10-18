@@ -1,8 +1,6 @@
 import React, {useState} from 'react';
-import {ScrollView, Text, Button, KeyboardAvoidingView, SafeAreaView, TextInput} from 'react-native';
-import {onSignIn} from '../auth';
-import { IUserData } from '@/interfaces/UserData';
-import { Link, useNavigation, useRouter } from "expo-router";
+import {ScrollView, View, Text, Button, KeyboardAvoidingView, StyleSheet, TextInput} from 'react-native';
+import { useRouter } from "expo-router";
 import api from '../services/api';
 
 export default function Register(){
@@ -68,32 +66,45 @@ export default function Register(){
     }
 
     return(
-        <ScrollView>
+        <ScrollView style={styles.mainContainer}>
             <KeyboardAvoidingView style={{ paddingVertical: 15 }}>
-                {/* <SafeAreaView> */}
+                <View style={styles.inputContainer}>
                     <TextInput
+                        style={styles.input}
                         placeholder='Nome'
                         onChangeText={text => handleTextInputChange('name', text)}
                         value={name}
                     />
+                </View>                
+                <View style={styles.inputContainer}>
                     <TextInput
+                        style={styles.input}
+                        inputMode="email"
+                        autoCapitalize="none"
+                        keyboardType="email-address"
                         placeholder='Email'
                         onChangeText={text => handleTextInputChange('email', text)}
                         value={email}
                     />
+                </View>
+                <View style={styles.inputContainer}>
                     <TextInput
+                        style={styles.input}
                         placeholder='Senha'
                         onChangeText={text => handleTextInputChange('password', text)}
                         secureTextEntry={true}
                         value={password}
                     />
+                </View>
+                <View style={styles.inputContainer}>
                     <TextInput
+                        style={styles.input}
                         placeholder='Confirme a senha'
                         onChangeText={text => handleTextInputChange('passwordConfirm', text)}
                         secureTextEntry={true}
                         value={passwordConfirm}
                     />
-                {/* </SafeAreaView> */}
+                </View>
             </KeyboardAvoidingView>
             <Button
                 title="Cadastrar"
@@ -102,3 +113,37 @@ export default function Register(){
         </ScrollView>        
     )
 }
+
+const styles = StyleSheet.create({
+    mainContainer: {
+        paddingTop: 80,
+        paddingHorizontal: 10,
+        backgroundColor: 'rgb(16, 93, 147)', 
+        flex: 1
+    },
+    title: {
+        color: '#fff',
+        fontSize: 30,
+        textAlign: 'center'
+    },
+    subtitle: {
+        marginTop: 30,
+        color: '#eaeaea',
+        fontSize: 16,
+        textAlign: 'center'
+    },
+    inputContainer: {
+        backgroundColor: '#fff',
+        marginVertical: 15,
+        padding: 10
+    },
+    input: {
+        fontSize: 15
+    },
+    btnSignUp: {
+        marginTop: 15,
+        textAlign: 'right',
+        fontSize: 20,
+        color: '#fff'
+    }
+});

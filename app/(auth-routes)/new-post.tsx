@@ -1,12 +1,14 @@
-import {View, Text, Button, TextInput} from 'react-native';
+import {View, Text, Button, TextInput, StyleSheet} from 'react-native';
 import { useState } from 'react';
 import PostPreview from '../../components/PostPreview';
 import Camera from '../../components/Camera';
 import Gallery from '../../components/Gallery';
 import { useSession } from "../ctx";
 import api from '../../services/api';
+import { useNavigation } from '@react-navigation/native';
 
 export default function NewPost(){
+  const navigation = useNavigation();
   const { sessionData } = useSession();
   const [openCamera, setOpenCamera] = useState<boolean>(false);
   const [openGallery, setOpenGallery] = useState<boolean>(false);
@@ -36,9 +38,10 @@ export default function NewPost(){
       title
     }
 
-    api.post('feed/post', newPost)
+    api.put('post', newPost)
     .then(post => {
       alert('Post salvo com sucesso!');
+      navigation.goBack();
     })
     .catch(err => {
       console.log(err);
@@ -51,12 +54,13 @@ export default function NewPost(){
 
   if(recordedVideoURI) return (
     <View>
-      <Text>Salvar post</Text>
+      <Text style={styles.title}>Salvar post</Text>
       <PostPreview videoURI={recordedVideoURI}/>
       <TextInput
-          placeholder='Título'
-          onChangeText={text => setTitle(text)}
-          value={title}
+        style={styles.postTitleContainer}
+        placeholder='Título'
+        onChangeText={text => setTitle(text)}
+        value={title}
       />
       <Button onPress={savePost} title="Salvar" />
     </View>
@@ -91,3 +95,19 @@ export default function NewPost(){
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  title: {
+    marginVertical: 20,
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+  postTitleContainer: {
+    marginVertical: 10,
+    padding: 5,
+    borderColor: '#000',
+    borderWidth: 0.5,
+    borderStyle: 'solid'
+  }
+});

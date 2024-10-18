@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Text} from 'react-native';
+import {View, Text} from 'react-native';
 import { Tabs, Redirect, Stack } from 'expo-router';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
@@ -9,10 +9,6 @@ import { useSession } from '../../ctx';
 export default function HomeLayout() {
   const { session, isLoading } = useSession();
   const colorScheme = useColorScheme();
-
-  useEffect(() => {
-    console.log('use effect home')
-  }, [])
 
   if (isLoading) return <Text>Loading...</Text>;
 
@@ -29,9 +25,9 @@ export default function HomeLayout() {
         name="feed"
         options={{
           title: 'Feed',
-          headerShown: false,
+          headerShown: true,
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+            <TabBarIcon name={focused ? 'film' : 'film-outline'} color={color} />
           ),
         }}
       />
@@ -40,7 +36,7 @@ export default function HomeLayout() {
         options={{
           title: 'Meu perfil',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            <TabBarIcon name={focused ? 'person-circle' : 'person-circle-outline'} color={color} />
           ),
         }}
       />

@@ -232,14 +232,15 @@ const getFeed = (filters: {userId: number, page: number}): Promise<any> => {
                     let userShares = [];
                     if(sharesData) {
                         userShares = JSON.parse(sharesData);
-                        userShares = userShares.filter((s: any) => s.userId === filters.userId);
+                        userShares = userShares.filter((s: any) => s.userId.toString() === filters.userId.toString());
                     }
+
                     if(postsData) allPosts = JSON.parse(postsData);
 
                     allPosts = allPosts.concat(defaultFeed);
-                    allPosts = allPosts.filter((p:any) => p.userId === filters.userId || 
+                    allPosts = allPosts.filter((p:any) => p.userId.toString() === filters.userId.toString() || 
                         userShares.filter((s:any) => s.postId.toString() === p.id.toString()).length);
-                    
+
                     let pagePosts = filters.page ? allPosts.slice(itemStart - 1, itemEnd - 1) : allPosts;
                     let returnPosts:any = [];
 
@@ -334,7 +335,7 @@ const getPost = (id: string): Promise<any> => {
 
 const getUser = (id: string): Promise<any> => {
     return new Promise((resolve, reject) => {
-        let user = defaultUsers.filter(u => u.id.toString() === id)[0];
+        let user = defaultUsers.filter(u => u.id.toString() === id.toString())[0];
         if(user) return resolve(user);
 
         AsyncStorage.getItem('users')
@@ -342,7 +343,7 @@ const getUser = (id: string): Promise<any> => {
             if(users){
                 const registeredUsers = JSON.parse(users);
 
-                user = registeredUsers.filter((ru:any) => ru.id === id)[0];
+                user = registeredUsers.filter((ru:any) => ru.id.toString() === id.toString())[0];
 
                 if(user) return resolve(user);
             }

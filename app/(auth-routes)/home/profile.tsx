@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {View, ScrollView, Text, Image, TouchableOpacity} from 'react-native';
+import {View, ScrollView, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import api from '../../../services/api';
 import { IFeedPost } from '@/interfaces/feedPost';
@@ -16,19 +16,18 @@ export interface IUserProfile {
 export default function Profile(){
     const router = useRouter();
     const { signOut, sessionData } = useSession();
-    const {id}:string | any = useLocalSearchParams();
     const [user, setUser] = useState<IUserProfile>({});
     const [userFeed, setUserFeed] = useState<any[]>([]);
 
-    useEffect(() => {        
-        loadUser(id);
+    useEffect(() => {
+        loadUser();
     }, []);
 
-    const loadUser = (id:number):void => {
+    const loadUser = ():void => {
         api.get('user', sessionData?.userId)
         .then(user => {
             setUser(user);
-            loadUserFeed(id);
+            loadUserFeed(sessionData?.userId);
         })
         .catch(err => {
             console.log(err);
@@ -36,7 +35,7 @@ export default function Profile(){
         })
     }
 
-    const loadUserFeed = (userId:number):void => {
+    const loadUserFeed = (userId?:number):void => {
         api.get('feed', {userId})
         .then(posts => {
             const feedItems:any = [];
@@ -71,22 +70,60 @@ export default function Profile(){
     let imageSource = require('../../../assets/images/avatar/0.png');
     
     return(
-        <View>
+        <View style={styles.mainContainer}>
             <TouchableOpacity onPress={handleExit}>
-                <Text>Sair (desfazer login)</Text>
+                <Text style={styles.btnExit}>Sair (desfazer login)</Text>
             </TouchableOpacity>
-            <Image source={imageSource} style={{width: 60, height:60, margin: 5, resizeMode: 'stretch'}}></Image>           
-            <Text>{user.name}</Text>
-            <Text>{user.email}</Text>
+            <View style={styles.userDataContainer}>
+                
+                <View style={styles.avatarContainer}>
+                    <Image source={imageSource} style={styles.avatar}></Image>
+                </View>           
+                <Text style={styles.userName}>{user.name}</Text>
+                <Text style={styles.userName}>{user.email}</Text>
+                <Text style={styles.feedTitle}>Seu feed</Text>
+            </View>
             
-            <Text>Seu feed</Text>
             <Feed userId={sessionData?.userId} />
-            {/* {userFeed.map((item, key) => (
-                <Text>{item.id} {item.title}</Text>
-                // <FeedItem key={key} item={item}/>
-            ))} */}
         </View>
         
     )
 }
 
+const styles = StyleSheet.create({
+    mainContainer: {
+        paddingVertical: 10,
+        marginVertical: 5,
+        padding: 5,
+    },
+    userDataContainer: {
+        alignItems: 'center'
+    },
+    avatarContainer: {
+        marginLeft: 8,
+        height: 90,
+        width: 90,
+        borderRadius: 40,
+        alignContent: 'center'
+    },
+    avatar: {
+        height: 90,
+        width: 90,
+        borderRadius: 40,
+    },
+    userName: {
+        fontSize: 20,
+        fontWeight: 'bold'
+    },
+    feedTitle: {
+        marginTop: 20,
+        fontSize: 16
+    },
+    btnExit: {
+        textAlign: 'right',
+        marginVertical: 10,
+        fontSize: 14,
+        textDecorationLine: 'underline',
+        color: 'red'
+    }
+});

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import {View, ScrollView, Text, Image} from 'react-native';
+import {View, ScrollView, Text, Image, StyleSheet} from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import api from '../../../services/api';
 import { IFeedPost } from '@/interfaces/feedPost';
-import FeedItem from '@/components/FeedItem';
+import Feed from '@/components/Feed';
 
 export interface IUserProfile {
     id?: number,
@@ -16,7 +16,7 @@ export default function UserProfile(){
     const [user, setUser] = useState<IUserProfile>({});
     const [userFeed, setUserFeed] = useState<[]>([]);
 
-    useEffect(() => {        
+    useEffect(() => {
         loadUser(id);
         loadUserFeed(id);
     }, []);
@@ -25,6 +25,7 @@ export default function UserProfile(){
         api.get('user', id)
         .then(user => {
             setUser(user);
+            loadUserFeed(id);
         })
         .catch(err => {
             console.log(err);
@@ -71,19 +72,52 @@ export default function UserProfile(){
         case 3:
             imageSource = require('../../../assets/images/avatar/3.png');
             break;
+        default:
+            imageSource = require('../../../assets/images/avatar/0.png');
+            break;
     }
     
     return(
-        <ScrollView>
-            {imageSource &&
-                <Image source={imageSource} style={{width: 60, height:60, margin: 5, resizeMode: 'stretch'}}></Image>
-            }            
-            <Text>{user.name}</Text>
-            <Text>Vídeos de {user.name}</Text>
-            {userFeed.map((item, key) => (
-                <FeedItem key={key} item={item}/>
-            ))}
-        </ScrollView>
-        
+        <View style={styles.mainContainer}>
+            <View style={styles.userDataContainer}>
+                <View style={styles.avatarContainer}>
+                    <Image source={imageSource} style={styles.avatar}></Image>
+                </View>                     
+                <Text style={styles.userName}>{user.name}</Text>
+                <Text style={styles.feedTitle}>Vídeos de {user.name}</Text>
+            </View>
+            <Feed userId={id} />
+        </View>
     )
 }
+
+const styles = StyleSheet.create({
+    mainContainer: {
+        paddingVertical: 10,
+        marginVertical: 5,
+        padding: 5,
+    },
+    userDataContainer: {
+        alignItems: 'center'
+    },
+    avatarContainer: {
+        marginLeft: 8,
+        height: 90,
+        width: 90,
+        borderRadius: 40,
+        alignContent: 'center'
+    },
+    avatar: {
+        height: 90,
+        width: 90,
+        borderRadius: 40,
+    },
+    userName: {
+        fontSize: 20,
+        fontWeight: 'bold'
+    },
+    feedTitle: {
+        marginTop: 20,
+        fontSize: 16
+    }
+});

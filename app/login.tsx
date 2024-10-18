@@ -1,7 +1,5 @@
-import React, {useState, useContext} from 'react';
-import {View, Text, Button, KeyboardAvoidingView, SafeAreaView, TextInput} from 'react-native';
-import {onSignIn} from '../auth';
-import { IUserData } from '@/interfaces/UserData';
+import React, {useState} from 'react';
+import {View, Text, Button, KeyboardAvoidingView, SafeAreaView, TextInput, StyleSheet} from 'react-native';
 import { Link, Redirect, useRouter } from "expo-router";
 import api from '../services/api';
 import { useSession } from "./ctx";
@@ -34,14 +32,6 @@ export default function Login(){
         .then(user => {
             signIn({userId: user.id, userName: user.name});
             router.replace('/home');
-
-            onSignIn('token')
-            .then((userData:IUserData) => {
-                router.replace('/');
-    
-                //router.push('/register');
-                //navigation.goBack();
-            });
         })
         .catch(() => {
             alert('Credenciais inválidas');
@@ -53,27 +43,76 @@ export default function Login(){
     }
 
     return(
-        <View>
+        <View style={styles.mainContainer}>
+            <Text style={styles.title}>Video&Video</Text>
+            <Text style={styles.subtitle}>Informe seus dados de acesso para continuar!</Text>
             <KeyboardAvoidingView style={{ paddingVertical: 15 }}>
             <SafeAreaView>
-                <TextInput
-                    placeholder='Email'
-                    onChangeText={text => handleTextInputChange('email', text)}
-                    value={email}
-                />
-                <TextInput
-                    placeholder='Senha'
-                    onChangeText={text => handleTextInputChange('password', text)}
-                    secureTextEntry={true}
-                    value={password}
-                />
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.input}
+                        inputMode="email"
+                        autoCapitalize="none"
+                        keyboardType="email-address"
+                        placeholder='Email'
+                        onChangeText={text => handleTextInputChange('email', text)}
+                        value={email}
+                    />
+                </View>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Senha'
+                        onChangeText={text => handleTextInputChange('password', text)}
+                        secureTextEntry={true}
+                        value={password}
+                    />
+                </View>
             </SafeAreaView>
             </KeyboardAvoidingView>
             <Button
                 title="Login"
                 onPress={handleLogin}
             />
-            <Link href={'/register'}>Criar uma conta</Link>
+            <View>
+            </View>
+            <Link style={styles.btnSignUp} href={'/register'}>
+                <Text>Criar uma conta</Text>
+            </Link>
         </View>        
     )
 }
+
+const styles = StyleSheet.create({
+    mainContainer: {
+        paddingTop: 80,
+        paddingHorizontal: 10,
+        backgroundColor: 'rgb(16, 93, 147)', 
+        flex: 1
+    },
+    title: {
+        color: '#fff',
+        fontSize: 30,
+        textAlign: 'center'
+    },
+    subtitle: {
+        marginTop: 30,
+        color: '#eaeaea',
+        fontSize: 16,
+        textAlign: 'center'
+    },
+    inputContainer: {
+        backgroundColor: '#fff',
+        marginVertical: 15,
+        padding: 10
+    },
+    input: {
+        fontSize: 18
+    },
+    btnSignUp: {
+        marginTop: 15,
+        textAlign: 'right',
+        fontSize: 20,
+        color: '#fff'
+    }
+});

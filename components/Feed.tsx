@@ -1,15 +1,17 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, Button, ActivityIndicator, FlatList, SafeAreaView, RefreshControl} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, RefreshControl} from 'react-native';
 import { IFeedPost } from '@/interfaces/feedPost';
 import api from '../services/api';
 import FeedItem from './FeedItem';
 import {useRouter} from 'expo-router';
+import { usePathname } from "expo-router";
 
 interface FeedProps {
     userId?: number | null
 }
 
 export default function Feed({userId}:FeedProps){
+    const path = usePathname();
     const router = useRouter();
 
     const [feedPage, setFeedPage] = useState<number>(1)
@@ -19,7 +21,7 @@ export default function Feed({userId}:FeedProps){
 
     useEffect(() => {
         loadFeed(1);
-    }, []);
+    }, [path]);
 
     const handleNewPost = () => {
         router.push('/new-post');
@@ -39,8 +41,6 @@ export default function Feed({userId}:FeedProps){
 
         api.get('feed', {page: pageLoad, userId})
         .then(posts => {
-            console.log('posts', posts);
-
             if(posts.length < 3){
                 setFeedEnd(true);
                 if(!posts.length) return;
@@ -84,10 +84,14 @@ export default function Feed({userId}:FeedProps){
                         onEndReached={() => loadFeed(feedPage + 1)}
                         onEndReachedThreshold={1}
                         initialScrollIndex={0}
-                        ListHeaderComponent={userId ? null : <Button
-                            title="+ Novo post"
-                            onPress={handleNewPost}
-                        />}
+                        ListHeaderComponent={userId ? null : 
+                            <TouchableOpacity onPress={handleNewPost}>
+                                <View style={styles.btnNewPost}>
+                                    <Text style={styles.btnNewPostLabel}>+ Novo post</Text>
+                                </View>                                
+                            </TouchableOpacity>
+                            
+                        }
                         ListFooterComponent={
                             <View style={{height: 300}}>
                                 {feedEnd ? 
@@ -111,13 +115,18 @@ export default function Feed({userId}:FeedProps){
 }
 
 const styles = StyleSheet.create({
-    menuTop: {
-        display: 'flex', 
-        flexDirection: 'row', 
-        justifyContent: 'space-around',
+    btnNewPost: {
+        textAlign: 'center',
+        backgroundColor: 'rgb(16, 93, 147)',
+        marginHorizontal: 30,
         padding: 10,
-        borderBottomColor: '#000',
-        borderBottomWidth: 1
+        borderRadius: 15
+    },
+    btnNewPostLabel: {
+        textAlign: 'center',
+        fontSize: 18,
+        color: '#fff',
+        fontWeight: 'bold'
     },
     menuItem: {
         fontSize: 16

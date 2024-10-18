@@ -89,18 +89,20 @@ export default function UserProfile(){
                     <Text style={shared ? styles.optionItemSelected : styles.optionItem}>{shared ? 'Compartilhado' : 'Compartilhar'}</Text>
                 </TouchableOpacity>
             </View>
-            <Text>Comentários</Text>
+            <Text style={styles.commentsTitle}>Comentários</Text>
             {comments.map((comment:any, key:number) => 
                 <View style={styles.commentBox} key={key}>
                     <Text style={styles.commentUser}>{comment.userName}</Text>
                     <Text style={styles.commentContent}>{comment.comment}</Text>
                 </View>
             )}
-            <TextInput
-                placeholder='Novo comentário'
-                onChangeText={text => setNewComment(text)}
-                value={newComment}
-            />
+            <View style={styles.newCommentContainer}>
+                <TextInput
+                    placeholder='Novo comentário'
+                    onChangeText={text => setNewComment(text)}
+                    value={newComment}
+                />
+            </View>            
             <Button onPress={sendComment} title="Enviar comentário" />
         </ScrollView>
         
@@ -123,9 +125,14 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold'
     },
+    commentsTitle: {
+        marginTop: 20,
+        fontSize: 16,
+        textAlign: 'center'
+    },
     commentBox: {
         marginVertical: 5,
-        backgroundColor: '#eaeaea'
+        backgroundColor: '#def1ff'
     },
     commentUser: {
         fontSize: 18,
@@ -133,5 +140,12 @@ const styles = StyleSheet.create({
     },
     commentContent: {
         fontSize: 16
+    },
+    newCommentContainer: {
+        marginVertical: 10,
+        padding: 5,
+        borderColor: '#000',
+        borderWidth: 0.5,
+        borderStyle: 'solid'
     }
 });
