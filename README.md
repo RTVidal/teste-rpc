@@ -7,13 +7,13 @@ Projeto [Expo](https://expo.dev) criado com [`create-expo-app`](https://www.npmj
 
 Após o downlod do repositório, executar os seguintes comandos para rodar o projeto localmente em um emulador ou dispositivo android conectado
 
+Opção 1: Gerar build localmente
+
 1. Instalar dependências
 
    ```bash
    npm install
    ```
-
-Opção 1: Gerar build localmente
 
 2. Gerar um build local
 
@@ -31,6 +31,12 @@ Opção 1: Gerar build localmente
 
 Opção 2: Gerar build via **eas**
 
+1. Instalar dependências
+
+   ```bash
+   npm install
+   ```
+
 2. Gerar um build
 
    ```bash
@@ -44,6 +50,10 @@ Opção 2: Gerar build via **eas**
    ```
 
 4. Seguir as instruções do prompt para atualizar o aplicativo no dispositivo
+
+Opção 3: Instalar diretamente a apk gerada via **eas build** e disponibilizada no ambiente **expo.dev**
+
+Disponível em [https://expo.dev/accounts/rafaelvidal/projects/teste-rpc/builds/20fc2e3a-3370-4507-91f1-a775aeee9872](https://expo.dev/accounts/rafaelvidal/projects/teste-rpc/builds/20fc2e3a-3370-4507-91f1-a775aeee9872)
 
 ## Observações gerais
 
