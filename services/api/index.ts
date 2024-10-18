@@ -240,7 +240,7 @@ const getFeed = (filters: {userId: number, page: number}): Promise<any> => {
                     allPosts = allPosts.concat(defaultFeed);
                     allPosts = allPosts.filter((p:any) => p.userId.toString() === filters.userId.toString() || 
                         userShares.filter((s:any) => s.postId.toString() === p.id.toString()).length);
-                    console.log('allPosts', allPosts)
+
                     let pagePosts = filters.page ? allPosts.slice(itemStart - 1, itemEnd - 1) : allPosts;
                     let returnPosts:any = [];
                     pagePosts.forEach((p: any) => {
@@ -430,54 +430,48 @@ const defaultFeed = [
         id: 1,
         userId: 1,
         userName: '',
-        mediaType: 'IMAGE',
         mediaURI: '',
-        title: 'Azul',
+        title: 'Laranja',
         likes: []
     },
     {
         id: 2,
         userId: 2,
         userName: '',
-        mediaType: 'IMAGE',
         mediaURI: '',
-        title: 'Amarelo',
+        title: 'Maçã',
         likes: []
     },
     {
         id: 3,
         userId: 3,
         userName: '',
-        mediaType: 'IMAGE',
         mediaURI: '',
-        title: 'Verde',
+        title: 'Melancia',
         likes: []
     },
     {
         id: 4,
         userId: 1,
         userName: '',
-        mediaType: 'IMAGE',
         mediaURI: '',
-        title: 'Vermelho',
+        title: 'Banana',
         likes: []
     },
     {
         id: 5,
         userId: 2,
         userName: '',
-        mediaType: 'IMAGE',
         mediaURI: '',
-        title: 'Laranja',
+        title: 'Melão',
         likes: []
     },
     {
         id: 6,
         userId: 3,
         userName: '',
-        mediaType: 'IMAGE',
         mediaURI: '',
-        title: 'Cinza',
+        title: 'Uva',
         likes: []
     }
 ]

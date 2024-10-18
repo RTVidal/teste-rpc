@@ -1,19 +1,19 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, RefreshControl} from 'react-native';
+import {View, ScrollView, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, RefreshControl} from 'react-native';
 import { IFeedPost } from '@/interfaces/feedPost';
 import api from '../services/api';
 import FeedItem from './FeedItem';
 import {useRouter} from 'expo-router';
-//import { usePathname } from "expo-router";
+import { usePathname } from "expo-router";
 
 interface FeedProps {
     userId?: number | null
 }
 
 export default function Feed({userId}:FeedProps){
-    // const path = usePathname();
+    const path = usePathname();
     const router = useRouter();
-
+    
     const [feedPage, setFeedPage] = useState<number>(1)
     const [loadingFeed, setLoadingFeed] = useState<boolean>(true);
     const [feedItems, setFeedItems] = useState<IFeedPost[]>([]);
@@ -21,7 +21,7 @@ export default function Feed({userId}:FeedProps){
 
     useEffect(() => {
         loadFeed(1);
-    }, []);
+    }, [path]);
 
     const handleNewPost = () => {
         router.push('/new-post');
@@ -78,13 +78,13 @@ export default function Feed({userId}:FeedProps){
                 <SafeAreaView>
                     <FlatList
                         data={feedItems}
-                        renderItem={({item}) => <FeedItem item={item} userId={userId} />}
+                        //renderItem={({item}) => <FeedItem item={item} userId={userId} />}
+                        renderItem={({item}) => _feedItem({item}, userId)}
                         keyExtractor={item => item.id ? item.id.toString() : ''}
                         onEndReached={() => {
-                            if(feedItems.length >= 3) loadFeed(feedPage + 1);                            
+                            if(feedItems.length >= 3 && !loadingFeed) loadFeed(feedPage + 1);                            
                         }}
-                        onEndReachedThreshold={0.3}
-                        initialScrollIndex={0}
+                        onEndReachedThreshold={0}
                         ListHeaderComponent={userId ? null : 
                             <TouchableOpacity onPress={handleNewPost}>
                                 <View style={styles.btnNewPost}>
@@ -94,10 +94,10 @@ export default function Feed({userId}:FeedProps){
                             
                         }
                         ListFooterComponent={
-                            <View style={{height: 300}}>
+                            <View>
                                 {feedEnd ? 
-                                <Text style={styles.textFeedEnd}>(todos os posts deste feed foram carregados.)</Text> :
-                                <Text style={styles.textFeedEnd}>(buscando novos posts...)</Text>
+                                <Text style={userId ? styles.textFeedEndUser : styles.textFeedEnd}>(todos os posts deste feed foram carregados.)</Text> :
+                                <Text style={userId ? styles.textFeedEndUser : styles.textFeedEnd}>(buscando novos posts...)</Text>
                                 }
                             </View>
                         }
@@ -114,6 +114,8 @@ export default function Feed({userId}:FeedProps){
         
     )
 }
+
+const _feedItem = ({item}:any, userId?:number | null | undefined) => <FeedItem item={item} userId={userId} />;
 
 const styles = StyleSheet.create({
     btnNewPost: {
@@ -153,5 +155,10 @@ const styles = StyleSheet.create({
     textFeedEnd: {
         textAlign: 'center',
         fontSize: 12
+    },
+    textFeedEndUser: {
+        textAlign: 'center',
+        fontSize: 12,
+        marginBottom: 300
     }
 });

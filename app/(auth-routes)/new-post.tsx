@@ -53,7 +53,7 @@ export default function NewPost(){
   if(openGallery) return <Gallery onSelectEnd={onGallerySelectEnd} onSelectCancel={handleCancel}/>;
 
   if(recordedVideoURI) return (
-    <View>
+    <View style={styles.mainContainer}>
       <Text style={styles.title}>Salvar post</Text>
       <PostPreview videoURI={recordedVideoURI}/>
       <TextInput
@@ -97,6 +97,10 @@ export default function NewPost(){
 }
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    paddingHorizontal: 10,
+    paddingBottom: 15
+  },
   title: {
     marginVertical: 20,
     fontSize: 16,

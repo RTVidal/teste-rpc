@@ -79,8 +79,8 @@ export default function UserProfile(){
     }
     
     return(
-        <ScrollView>
-            <FeedItem item={post} autoPlay={true}/>
+        <ScrollView style={styles.mainContainer}>
+            <FeedItem item={post} endPost={true}/>
             <View style={styles.postOptions}>
                 <TouchableOpacity onPress={handleLike}>
                     <Text style={liked ? styles.optionItemSelected : styles.optionItem}>{liked ? 'Curtido' : 'Curtir'}</Text>
@@ -110,6 +110,10 @@ export default function UserProfile(){
 }
 
 const styles = StyleSheet.create({
+    mainContainer: {
+        paddingHorizontal: 5,
+        paddingBottom: 15
+    },
     postOptions: {
         display: 'flex', 
         flexDirection: 'row', 

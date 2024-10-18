@@ -1,38 +1,39 @@
 import React, {useState, useEffect, useRef} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, FlatList, SafeAreaView, Image} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import { IFeedPost } from '@/interfaces/feedPost';
-import api from '../services/api';
 import { Link, Href, useRouter } from 'expo-router';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import Video from './Video';
 
 interface FeedItemProps {
     item: IFeedPost
     autoPlay?: boolean,
-    userId?: number | null
+    userId?: number | null,
+    endPost?: boolean
 }
 
-export default function FeedItem({item, autoPlay, userId}:FeedItemProps){
+function FeedItem({item, autoPlay, userId, endPost}:FeedItemProps){    
     const router = useRouter();
     const [playing, setPlaying] = useState<boolean>(autoPlay ? true : false);
     const videoRef = useRef(null);
 
     let videoSource = item.mediaURI ? item.mediaURI : require('../assets/videos/1.mp4');
 
-    const player = useVideoPlayer(videoSource, player => {
-        player.loop = true;
-        //player.muted = true;
-        if(autoPlay) player.play();
-    });
+    // const player = useVideoPlayer(videoSource, player => {
+    //     player.loop = true;
+    //     //player.muted = true;
+    //     if(autoPlay) player.play();
+    // });
 
-    const togglePlay = () => {
-        if(playing){
-            player.pause();
-        } else {
-            player.play();
-        }
-        setPlaying(!playing);
-    }
+    // const togglePlay = () => {
+    //     if(playing){
+    //         player.pause();
+    //     } else {
+    //         player.play();
+    //     }
+    //     setPlaying(!playing);
+    // }
 
     let imageSource = null;
 
@@ -70,37 +71,45 @@ export default function FeedItem({item, autoPlay, userId}:FeedItemProps){
                         <Text style={styles.userName}>{item.userName}</Text>                        
                     </View>
                 </Link> 
-            }                     
-            <View style={styles.mediaContainer}>
-                <VideoView
-                    ref={videoRef}
-                    style={styles.video}
-                    player={player}
-                    nativeControls={false}
-                />
-                <TouchableOpacity onPress={togglePlay}>
-                    <View style={styles.controlContainer}>
-                        <View style={styles.btnPlayPauseContainer}>
-                            <Ionicons name={playing ? 'pause' : 'play'} size={28} color="black" />
-                        </View>                            
+            }
+            <View>
+                {playing ? 
+                    <Video source={videoSource} stop={() => setPlaying(false)}/>
+                :
+                    <View style={[styles.mediaContainer, {backgroundColor: picRandomColor()}]}>
+                        <TouchableOpacity onPress={() => setPlaying(true)}>
+                            <Ionicons name={'play'} size={60} color="white" />
+                            <Text style={styles.titleLabel}>{item.title}</Text> 
+                        </TouchableOpacity>                
+                        {/* <VideoView
+                            ref={videoRef}
+                            style={styles.video}
+                            player={player}
+                            nativeControls={false}
+                        />
+                        <TouchableOpacity onPress={togglePlay}>
+                            <View style={styles.controlContainer}>
+                                <View style={styles.btnPlayPauseContainer}>
+                                    <Ionicons name={playing ? 'pause' : 'play'} size={28} color="black" />
+                                </View>                            
+                            </View>
+                        </TouchableOpacity> */}
                     </View>
-                </TouchableOpacity>
+                }
             </View>
-            {/* <Link href={`/post/${item.id}` as Href}> */}
-            <View style={styles.actionsContainer}>
-                <TouchableOpacity onPress={() => router.push(`/post/${item.id}`)}>
-                    <Text style={styles.actionsLabel}>Ver (curtir | compartilhar)</Text>
-                </TouchableOpacity>
-            </View>
-            {/* </Link> */}
-            {/* <Link href={`/post/${item.id}` as Href}> */}
-                <View style={styles.titleContainer}>
-                    <Text style={styles.titleLabel}>{item.title}</Text>   
+            
+            {(!userId && !endPost) &&
+                <View style={styles.actionsContainer}>
+                    <TouchableOpacity onPress={() => router.push(`/post/${item.id}`)}>
+                        <Text style={styles.actionsLabel}>Ver (curtir | comentar | compartilhar {userId})</Text>
+                    </TouchableOpacity>
                 </View>
-            {/* </Link> */}
+            }
         </View>
     )
 }
+
+export default React.memo(FeedItem);
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -129,12 +138,13 @@ const styles = StyleSheet.create({
     },
     mediaContainer: {
         marginTop: 5,
-        paddingTop: 5,
         borderRadius: 15,
         paddingBottom: 2,
+        paddingTop: 100,
         width: '100%',
-        backgroundColor: '#000',
-        alignContent: 'center'
+        //backgroundColor: '#000',
+        height: 300,
+        alignItems: 'center'
     },
     video: {
         width: '100%',
@@ -156,9 +166,11 @@ const styles = StyleSheet.create({
         paddingLeft: 10
     },
     titleLabel: {
-        fontSize: 15,
+        fontSize: 25,
+        marginTop: 30,
         textAlign: 'center',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        color: 'white'
     },
     actionsContainer: {
         paddingLeft: 10
@@ -173,3 +185,21 @@ const styles = StyleSheet.create({
         paddingRight: 5
     }
 });
+
+const picRandomColor = ():string => {
+    let code = Math.floor(Math.random() * 10);
+
+    switch(code){
+        case 0: return '#ff0000';
+        case 1: return '#4287f5';        
+        case 2: return '#ffa600';
+        case 3: return '#ffbf00';
+        case 4: return '#11b853';
+        case 5: return '#d138b8';
+        case 6: return '#752238';
+        case 7: return '#22756a';
+        case 8: return '#432275';
+        case 9: return '#733a14';
+        default: return '#ff0000'
+    }
+}
