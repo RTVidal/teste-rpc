@@ -64,3 +64,16 @@ O aplicativo possui um módulo interno simulando uma api, dispensando conexão c
 Para fins de otimização, os posts de usuários fictícios exibem o mesmo asset de vídeo. Entretando, cada post é único dentro do cenário do aplicativo.
 
 Em caso de dúvidas, é possível entrar em contato através do email **rafaelvidal4@gmail.com**.
+
+## Versão adicional disponível
+
+Versão adicional disponível em [https://github.com/RTVidal/teste-rpc-2](https://github.com/RTVidal/teste-rpc-2) com ajustes e melhorias implementadas após a data de disponibilização do projeto. Versão em repositório separado a fim de não alterar o código-fonte do repositório original após o período estabelecido para desenvolvimento no documento de especificação do projeto.
+
+Alterações em relação à versão original:
+
+- Posts fixos com vídeos variados
+- Vídeos de posts fixos com thumbnails com imagens ao invés de apenas cores
+- Implementação de controle para não permitir a execução simultânea de dois ou mais vídeos, evitando lentidão, travamentos e crashs
+- Implementação de controle para encerrar execução de vídeo ao sair do componente
+- Correção de bug de cor da estrutura de abas da home onde, caso dispositivo em modo escuro, a opção selecionada não ficava visível
+- Melhor organização do código-fonte
